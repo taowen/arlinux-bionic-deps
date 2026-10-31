@@ -21,7 +21,7 @@ fetch() {
 fetch https://mirrors.kernel.org/gnu/gmp/gmp-6.3.0.tar.xz gmp-6.3.0 a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898
 fetch https://mirrors.kernel.org/gnu/nettle/nettle-3.10.2.tar.gz nettle-3.10.2 fe9ff51cb1f2abb5e65a6b8c10a92da0ab5ab6eaf26e7fc2b675c45f1fb519b5
 fetch https://mirrors.kernel.org/gnu/libunistring/libunistring-1.4.1.tar.xz libunistring-1.4.1 67d88430892527861903788868c77802a217b0959990f7449f2976126a307763
-fetch https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz gnutls-3.8.13 ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e
+fetch https://mirrors.dotsrc.org/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz gnutls-3.8.13 ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e
 build() { local name=$1; shift; if [[ ! -f "$base/$name.done" ]]; then mkdir -p "$base/$name"; cd "$base/$name"; "$base/source/$name/configure" --host=aarch64-linux-android --prefix="$prefix" --disable-static --enable-shared "$@" > "$base/$name-configure.log" 2>&1; make -j8 > "$base/$name-build.log" 2>&1; make install > "$base/$name-install.log" 2>&1; touch "$base/$name.done"; fi; }
 build gmp-6.3.0 --disable-assembly
 build nettle-3.10.2 --disable-documentation --disable-assembler
