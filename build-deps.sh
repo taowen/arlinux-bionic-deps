@@ -22,3 +22,26 @@ export PATH="$ndk/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
 for recipe in ndk-wayland ndk-deps ndk-xcb; do
     bash "$work/tools/build/$recipe.sh"
 done
+
+# Only the client library: connect Wine to the existing desktop bus, never
+# install or launch another daemon inside the Bionic runtime.
+archive="$work/dbus-1.16.2.tar.xz"
+curl -L --fail --retry 5 --retry-all-errors --connect-timeout 20 \
+    https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz -o "$archive"
+printf '%s  %s\n' 0ba2a1a4b16afe7bceb2c07e9ce99a8c2c3508e5dec290dbb643384bd6beb7e2 "$archive" | sha256sum -c -
+python3 - "$archive" "$work" <<'DBUS_SOURCE'
+import sys, tarfile
+with tarfile.open(sys.argv[1]) as source:
+    source.extractall(sys.argv[2], filter='data')
+DBUS_SOURCE
+meson setup "$work/dbus-build" "$work/dbus-1.16.2" \
+    --cross-file "$NDK_PREFIX/android-cross-export.ini" --native-file "$NDK_PREFIX/native.ini" \
+    --prefix="$NDK_PREFIX" --libdir=lib --buildtype=release --default-library=shared \
+    -Dauto_features=disabled -Dmessage_bus=false -Dtools=false \
+    -Dtraditional_activation=false -Duser_session=false
+meson compile -C "$work/dbus-build" -j"$JOBS"
+meson install -C "$work/dbus-build"
+mkdir -p "$NDK_PREFIX/share/licenses/dbus-1"
+cp "$work/dbus-1.16.2/COPYING" "$NDK_PREFIX/share/licenses/dbus-1/"
+printf '%s\n' 'https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz' \
+    > "$NDK_PREFIX/share/licenses/dbus-1/SOURCE"
