@@ -89,3 +89,7 @@ build_gst gst-plugins-base c1fda668b520e6aef763c0eb962c032c9fe52bce322e8b00c69b4
     -Dapp=enabled -Daudioconvert=enabled -Daudioresample=enabled -Dplayback=enabled \
     -Dtypefind=enabled -Dvideoconvertscale=enabled
 build_gst gst-libav 4b3df21fa70972a80891d2298cf32c14a62c3db4483d545c7ac018230399186b
+# gst-libav registers codecs, but deliberately leaves ASF demuxing to this
+# upstream plugin. Wine's default byte-stream handler needs both stages.
+build_gst gst-plugins-ugly 550a52536962186f5488e06b5c08f31ae0f18400aee32a3385156d31cb4b1189 \
+    -Dasfdemux=enabled
